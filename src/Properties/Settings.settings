@@ -29,5 +29,17 @@
     <Setting Name="Scale" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">1</Value>
     </Setting>
+    <Setting Name="OllamaEndpoint" Type="System.String" Scope="User">
+      <Value Profile="(Default)">http://localhost:11434</Value>
+    </Setting>
+    <Setting Name="OllamaModel" Type="System.String" Scope="User">
+      <Value Profile="(Default)">llama3.2:1b</Value>
+    </Setting>
+    <Setting Name="OllamaSystemPrompt" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Eres una mascota virtual adorable y graciosa. Tus respuestas deben ser muy cortas, maximo 2 oraciones. Respondes en espanol.</Value>
+    </Setting>
+    <Setting Name="OllamaEnabled" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

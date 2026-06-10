@@ -111,7 +111,104 @@ namespace DesktopPet
             label9.Text = Math.Pow(2, (trackBar3.Value - 1)).ToString() + "x";
             checkBox3.Checked = Program.MyData.GetMultiscreen();
 
+            // Load local model settings
+            chkOllamaEnabled.CheckedChanged -= new System.EventHandler(this.ChkOllamaEnabled_CheckedChanged);
+            chkOllamaEnabled.Checked = Program.MyData.GetOllamaEnabled();
+            chkOllamaEnabled.CheckedChanged += new System.EventHandler(this.ChkOllamaEnabled_CheckedChanged);
+            txtOllamaPrompt.Text = Program.MyData.GetOllamaSystemPrompt();
+            UpdateOllamaUI();
+            UpdateModelStatus();
+
             flowLayoutPanel2.Visible = false;
+        }
+
+        private void UpdateOllamaUI()
+        {
+            bool en = chkOllamaEnabled.Checked;
+            btnDownloadModel.Enabled = en;
+            txtOllamaPrompt.Enabled = en;
+            btnSavePrompt.Enabled = en;
+            btnTestConnection.Enabled = en;
+        }
+
+        private void UpdateModelStatus()
+        {
+            if (Program.Mainthread?.ModelManager != null)
+            {
+                lblModelStatus.Text = Program.Mainthread.ModelManager.Status;
+                if (Program.Mainthread.ModelManager.IsReady)
+                    lblModelStatus.ForeColor = Color.Green;
+                else
+                    lblModelStatus.ForeColor = Color.DarkOrange;
+            }
+        }
+
+        private void ChkOllamaEnabled_CheckedChanged(object sender, EventArgs e)
+        {
+            Program.MyData.SetOllamaEnabled(chkOllamaEnabled.Checked);
+            UpdateOllamaUI();
+            if (Program.Mainthread != null) Program.Mainthread.ConfigureOllama();
+        }
+
+        private void BtnSavePrompt_Click(object sender, EventArgs e)
+        {
+            Program.MyData.SetOllamaSystemPrompt(txtOllamaPrompt.Text);
+            if (Program.Mainthread != null) Program.Mainthread.ConfigureOllama();
+            lblConnectionStatus.Text = "Prompt saved";
+            lblConnectionStatus.ForeColor = System.Drawing.Color.Green;
+        }
+
+        private async void BtnTestConnection_Click(object sender, EventArgs e)
+        {
+            btnTestConnection.Enabled = false;
+            btnTestConnection.Text = "Testing...";
+            lblConnectionStatus.Text = "Connecting...";
+            lblConnectionStatus.ForeColor = System.Drawing.Color.Blue;
+
+            bool ok = await OllamaClient.CheckConnectionAsync();
+            if (ok)
+            {
+                lblConnectionStatus.Text = "✓ Server ready";
+                lblConnectionStatus.ForeColor = System.Drawing.Color.Green;
+            }
+            else
+            {
+                lblConnectionStatus.Text = "✗ Server not responding";
+                lblConnectionStatus.ForeColor = System.Drawing.Color.Red;
+            }
+
+            btnTestConnection.Text = "Test Connection";
+            btnTestConnection.Enabled = chkOllamaEnabled.Checked;
+        }
+
+        private async void BtnDownloadModel_Click(object sender, EventArgs e)
+        {
+            btnDownloadModel.Enabled = false;
+            btnDownloadModel.Text = "Downloading...";
+            lblModelStatus.Text = "Starting download...";
+            lblModelStatus.ForeColor = System.Drawing.Color.Blue;
+
+            Program.Mainthread.ModelManager.StatusChanged += () =>
+            {
+                if (lblModelStatus.IsHandleCreated)
+                {
+                    lblModelStatus.BeginInvoke(new Action(() =>
+                    {
+                        lblModelStatus.Text = Program.Mainthread.ModelManager.Status;
+                        if (Program.Mainthread.ModelManager.IsReady)
+                        {
+                            lblModelStatus.ForeColor = System.Drawing.Color.Green;
+                            lblConnectionStatus.Text = "✓ Model ready";
+                            OllamaClient.UseOpenAiFormat = true;
+                        }
+                    }));
+                }
+            };
+
+            await Program.Mainthread.ModelManager.EnsureModelReadyAsync();
+
+            btnDownloadModel.Text = "Download Model";
+            btnDownloadModel.Enabled = chkOllamaEnabled.Checked;
         }
 
         private void FormOptions_Shown(object sender, EventArgs e)

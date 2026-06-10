@@ -8,6 +8,7 @@ using System.IO;
 using System.Diagnostics;
 using System.Threading;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace DesktopPet
 {
@@ -88,6 +89,20 @@ namespace DesktopPet
         int DisplayIndex = 0;
 
         private readonly List<FormPet> childs = new List<FormPet>(4);
+
+        private bool isChatting = false;
+        private int bubbleHeight = 0;
+        private static readonly Random chatRand = new Random();
+
+        internal int PetIndex { get; set; } = -1;
+        internal string PetName
+        {
+            get
+            {
+                try { return Xml?.AnimationXML?.Header?.Petname ?? "mascota"; }
+                catch { return "mascota"; }
+            }
+        }
 
         /// <summary>
         /// Form constructor. This is never called. <br />
@@ -314,12 +329,201 @@ namespace DesktopPet
             timer1.Enabled = true;                      // Enable timer (interval is known, now)
         }
 
-            /// <summary>
-            /// If application is closed, all forms have still 1 second to show something (change animation).
-            /// </summary>
-            /// <remarks>
-            /// Kill, Sync, Drag and Fall are "Key-names" in the XML file. If you use one of them, this program will automatically run the animation linked to this names.
-            /// </remarks>
+        public async void TriggerAI(string initialPrompt = null)
+        {
+            if (!OllamaClient.IsEnabled() || isChatting || Name.IndexOf("child") == 0) return;
+            isChatting = true;
+
+            string prompt;
+            if (!string.IsNullOrEmpty(initialPrompt))
+            {
+                prompt = initialPrompt;
+            }
+            else
+            {
+                string[] starters = {
+                    "Di algo gracioso como mascota virtual",
+                    "Saluda como una mascota adorable",
+                    "Di algo divertido sobre tu dia",
+                    "Haz un comentario sobre lo que ves",
+                    "Cuenta un chiste corto de mascotas"
+                };
+                prompt = starters[chatRand.Next(starters.Length)];
+            }
+
+            string response = await OllamaClient.GenerateAsync(prompt);
+            if (!string.IsNullOrEmpty(response))
+            {
+                ShowBubble(response);
+                if (StartUp.Instance != null)
+                {
+                    StartUp.Instance.BroadcastMessage(this, response);
+                }
+            }
+
+            isChatting = false;
+        }
+
+        public void ShowTalkDialog()
+        {
+            Form inputForm = new Form();
+            inputForm.Text = "Talk to " + PetName;
+            inputForm.Size = new System.Drawing.Size(400, 150);
+            inputForm.StartPosition = FormStartPosition.CenterScreen;
+            inputForm.FormBorderStyle = FormBorderStyle.FixedDialog;
+            inputForm.MaximizeBox = false;
+            inputForm.MinimizeBox = false;
+            inputForm.TopMost = true;
+            inputForm.ShowInTaskbar = false;
+
+            Label lbl = new Label();
+            lbl.Text = "What do you want to say?";
+            lbl.Location = new System.Drawing.Point(20, 15);
+            lbl.Size = new System.Drawing.Size(350, 20);
+
+            TextBox txtInput = new TextBox();
+            txtInput.Location = new System.Drawing.Point(20, 40);
+            txtInput.Size = new System.Drawing.Size(350, 50);
+            txtInput.Multiline = false;
+
+            Button btnSend = new Button();
+            btnSend.Text = "Send";
+            btnSend.Location = new System.Drawing.Point(150, 80);
+            btnSend.Size = new System.Drawing.Size(80, 25);
+            btnSend.DialogResult = DialogResult.OK;
+
+            inputForm.Controls.Add(lbl);
+            inputForm.Controls.Add(txtInput);
+            inputForm.Controls.Add(btnSend);
+            inputForm.AcceptButton = btnSend;
+
+            if (inputForm.ShowDialog() == DialogResult.OK && !string.IsNullOrWhiteSpace(txtInput.Text))
+            {
+                TriggerAI(txtInput.Text.Trim());
+            }
+            inputForm.Dispose();
+        }
+
+        private Form bubbleForm = null;
+        private Label bubbleLabelPopup = null;
+        private System.Windows.Forms.Timer followTimer = null;
+
+        private void UpdateBubblePosition()
+        {
+            if (bubbleForm == null || bubbleForm.IsDisposed || !bubbleForm.Visible) return;
+            int bw = bubbleForm.ClientSize.Width;
+            int bh = bubbleForm.ClientSize.Height;
+            bubbleForm.Location = new Point(Left + (pictureBox1.Width - bw) / 2, Top - bh - 4);
+        }
+
+        public void ShowBubble(string text)
+        {
+            if (string.IsNullOrEmpty(text)) return;
+
+            if (this.InvokeRequired)
+            {
+                this.BeginInvoke(new MethodInvoker(delegate { ShowBubble(text); }));
+                return;
+            }
+
+            if (bubbleForm == null || bubbleForm.IsDisposed)
+            {
+                bubbleForm = new Form();
+                bubbleForm.FormBorderStyle = FormBorderStyle.None;
+                bubbleForm.ShowInTaskbar = false;
+                bubbleForm.TopMost = true;
+                bubbleForm.BackColor = Color.FromArgb(255, 255, 225);
+                bubbleForm.Paint += BubbleForm_Paint;
+                bubbleLabelPopup = new Label();
+                bubbleLabelPopup.AutoSize = true;
+                bubbleLabelPopup.MaximumSize = new Size(240, 200);
+                bubbleLabelPopup.Padding = new Padding(10, 8, 10, 12);
+                bubbleLabelPopup.BackColor = Color.Transparent;
+                bubbleLabelPopup.Font = new Font("Segoe UI", 7, FontStyle.Regular);
+                bubbleLabelPopup.ForeColor = Color.Black;
+                bubbleForm.Controls.Add(bubbleLabelPopup);
+
+                followTimer = new System.Windows.Forms.Timer();
+                followTimer.Interval = 50;
+                followTimer.Tick += (s, e) => UpdateBubblePosition();
+            }
+
+            bubbleLabelPopup.Text = text;
+            int bw = Math.Min(bubbleLabelPopup.Width + 20, 250);
+            int bh = Math.Min(bubbleLabelPopup.Height + 20, 200);
+            bubbleForm.ClientSize = new Size(bw, bh + 8);
+            IntPtr rgn = NativeMethods.CreateRoundRectRgn(0, 0, bw + 1, bh + 9, 12, 12);
+            if (rgn != IntPtr.Zero)
+            {
+                bubbleForm.Region = System.Drawing.Region.FromHrgn(rgn);
+                NativeMethods.DeleteObject(rgn);
+            }
+            bubbleForm.Location = new Point(Left + (pictureBox1.Width - bw) / 2, Top - bh - 12);
+            bubbleForm.Visible = true;
+            followTimer.Start();
+
+            bubbleTimer.Stop();
+            bubbleTimer.Start();
+        }
+
+        private void BubbleForm_Paint(object sender, PaintEventArgs e)
+        {
+            var g = e.Graphics;
+            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+            var rc = bubbleForm.ClientRectangle;
+            rc.Height -= 8;
+            int r = 12;
+            using (var path = new System.Drawing.Drawing2D.GraphicsPath())
+            {
+                path.AddArc(rc.X, rc.Y, r, r, 180, 90);
+                path.AddArc(rc.Right - r, rc.Y, r, r, 270, 90);
+                path.AddArc(rc.Right - r, rc.Bottom - r, r, r, 0, 90);
+                path.AddArc(rc.X, rc.Bottom - r, r, r, 90, 90);
+                path.CloseFigure();
+                using (var pen = new Pen(Color.FromArgb(100, 100, 100), 2))
+                {
+                    g.DrawPath(pen, path);
+                }
+            }
+            int midX = rc.Width / 2;
+            int tailY = rc.Height;
+            var tail = new Point[] {
+                new Point(midX - 6, tailY),
+                new Point(midX + 6, tailY),
+                new Point(midX, tailY + 8)
+            };
+            using (var brush = new SolidBrush(Color.FromArgb(255, 255, 225)))
+            {
+                g.FillPolygon(brush, tail);
+            }
+            using (var pen = new Pen(Color.FromArgb(100, 100, 100), 2))
+            {
+                g.DrawLine(pen, midX - 6, tailY, midX, tailY + 8);
+                g.DrawLine(pen, midX + 6, tailY, midX, tailY + 8);
+            }
+        }
+
+        public void HideBubble()
+        {
+            bubbleTimer.Stop();
+            if (followTimer != null) followTimer.Stop();
+            if (bubbleForm != null && !bubbleForm.IsDisposed)
+            {
+                bubbleForm.Visible = false;
+            }
+        }
+
+        private void BubbleTimer_Tick(object sender, EventArgs e)
+        {
+            HideBubble();
+        }
+
+        /// <summary>
+        /// If application is closed, all forms have still 1 second to show something (change animation).
+        /// </summary>
+        /// <remarks>
+        /// Kill, Sync, Drag and Fall are "Key-names" in the XML file. If you use one of them, this program will automatically run the animation linked to this names.
+        /// </remarks>
         public void Kill()
         {
             foreach(var c in childs)
@@ -1086,6 +1290,10 @@ namespace DesktopPet
 				IsDragging = true;                   // Flag it as dragging pet
                 SetNewAnimation(Animations.AnimationDrag);  // Set the dragging animation (if present)
             }
+            else if (e.Button == MouseButtons.Right && OllamaClient.IsEnabled() && Name.IndexOf("child") < 0 && !StartUp.IsDebugActive())
+            {
+                ShowTalkDialog();
+            }
             else if(e.Button == MouseButtons.Right && StartUp.IsDebugActive())
             {
                 ContextMenu cm = new ContextMenu();
@@ -1243,7 +1451,10 @@ namespace DesktopPet
 
 		private void PictureBox1_Click(object sender, EventArgs e)
 		{
-
+            if (OllamaClient.IsEnabled() && Name.IndexOf("child") < 0)
+            {
+                TriggerAI();
+            }
 		}
 	}
 
@@ -1252,6 +1463,11 @@ namespace DesktopPet
 	/// </summary>
 	internal static class NativeMethods
     {
+        [DllImport("gdi32.dll")]
+        internal static extern IntPtr CreateRoundRectRgn(int x1, int y1, int x2, int y2, int cx, int cy);
+        [DllImport("gdi32.dll")]
+        internal static extern bool DeleteObject(IntPtr hObject);
+
             /// <summary>
             /// Get size of a window.
             /// </summary>

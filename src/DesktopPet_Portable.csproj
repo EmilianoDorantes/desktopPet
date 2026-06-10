@@ -12,7 +12,7 @@
     <AssemblyName>DesktopPet</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <IsWebBootstrapper>false</IsWebBootstrapper>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <TargetFrameworkProfile />
     <ResolveNuGetPackages>false</ResolveNuGetPackages>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -183,6 +183,8 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Windows">
@@ -194,6 +196,12 @@
     <Compile Include="dotNet\Animations.cs" />
     <Compile Include="dotNet\ContextMenus.cs" />
     <Compile Include="dotNet\EmbeddedAssembly.cs" />
+    <Compile Include="dotNet\OllamaClient.cs" />
+    <Compile Include="dotNet\OllamaService.cs" />
+    <Compile Include="dotNet\WindowsApiHelper.cs" />
+    <Compile Include="dotNet\PerformanceHelper.cs" />
+    <Compile Include="dotNet\TriggerEngine.cs" />
+    <Compile Include="dotNet\LocalModelManager.cs" />
     <Compile Include="dotNet\ProcessIcon.cs" />
     <Compile Include="LocalData\AnimationXML.cs" />
     <Compile Include="Portable\AboutBox.cs">

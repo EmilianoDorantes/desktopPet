@@ -94,10 +94,8 @@ namespace DesktopPet
             /// <param name="e">The <see cref="System.Windows.Forms.MouseEventArgs"/> instance containing the event data.</param>
         void Ni_MouseClick(object sender, MouseEventArgs e)
         {
-            // Handle mouse button clicks.
-            if (e.Button == MouseButtons.Left)
+            if (e.Button == MouseButtons.Left && Program.Mainthread != null)
             {
-                // Start Windows Explorer.
                 Program.Mainthread.TopMostSheeps();
             }
         }
@@ -109,11 +107,8 @@ namespace DesktopPet
             /// <param name="e">Mouse event values.</param>
         void Ni_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            // Handle mouse button clicks.
-            if (e.Button == MouseButtons.Left)
+            if (e.Button == MouseButtons.Left && Program.Mainthread != null)
             {
-                // Start Windows Explorer.
-                //Process.Start("explorer", null);
                 Program.Mainthread.AddSheep();
             }
         }

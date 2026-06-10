@@ -227,6 +227,87 @@ namespace DesktopPet
             return false;
         }
 
+        public string GetOllamaEndpoint()
+        {
+            if (AppSettings["OllamaEndpoint"] == null)
+            {
+                AppSettings.Add("OllamaEndpoint", "http://localhost:11434");
+                Save();
+            }
+            return AppSettings["OllamaEndpoint"]?.Value ?? "http://localhost:11434";
+        }
+
+        public void SetOllamaEndpoint(string ep)
+        {
+            if (AppSettings["OllamaEndpoint"] == null)
+                AppSettings.Add("OllamaEndpoint", ep);
+            else
+                AppSettings["OllamaEndpoint"].Value = ep;
+            Properties.Settings.Default.OllamaEndpoint = ep;
+            Save();
+        }
+
+        public string GetOllamaModel()
+        {
+            if (AppSettings["OllamaModel"] == null)
+            {
+                AppSettings.Add("OllamaModel", "llama3.2:1b");
+                Save();
+            }
+            return AppSettings["OllamaModel"]?.Value ?? "llama3.2:1b";
+        }
+
+        public void SetOllamaModel(string mod)
+        {
+            if (AppSettings["OllamaModel"] == null)
+                AppSettings.Add("OllamaModel", mod);
+            else
+                AppSettings["OllamaModel"].Value = mod;
+            Properties.Settings.Default.OllamaModel = mod;
+            Save();
+        }
+
+        public string GetOllamaSystemPrompt()
+        {
+            if (AppSettings["OllamaSystemPrompt"] == null)
+            {
+                AppSettings.Add("OllamaSystemPrompt", "Eres una mascota virtual adorable y graciosa. Tus respuestas deben ser muy cortas, maximo 2 oraciones. Respondes en espanol.");
+                Save();
+            }
+            return AppSettings["OllamaSystemPrompt"]?.Value ?? "Eres una mascota virtual adorable y graciosa. Tus respuestas deben ser muy cortas, maximo 2 oraciones. Respondes en espanol.";
+        }
+
+        public void SetOllamaSystemPrompt(string sp)
+        {
+            if (AppSettings["OllamaSystemPrompt"] == null)
+                AppSettings.Add("OllamaSystemPrompt", sp);
+            else
+                AppSettings["OllamaSystemPrompt"].Value = sp;
+            Properties.Settings.Default.OllamaSystemPrompt = sp;
+            Save();
+        }
+
+        public bool GetOllamaEnabled()
+        {
+            if (AppSettings["OllamaEnabled"] == null)
+            {
+                AppSettings.Add("OllamaEnabled", "False");
+                Save();
+            }
+            bool.TryParse(AppSettings["OllamaEnabled"]?.Value ?? "False", out bool ret);
+            return ret;
+        }
+
+        public void SetOllamaEnabled(bool en)
+        {
+            if (AppSettings["OllamaEnabled"] == null)
+                AppSettings.Add("OllamaEnabled", en.ToString());
+            else
+                AppSettings["OllamaEnabled"].Value = en.ToString();
+            Properties.Settings.Default.OllamaEnabled = en;
+            Save();
+        }
+
         public delegate void MyFunction(object source, FileSystemEventArgs e);
 
         public void ListenOnXMLChanged(MyFunction f)

@@ -32,7 +32,11 @@
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FormPet));
 			this.imageList1 = new System.Windows.Forms.ImageList(this.components);
 			this.timer1 = new System.Windows.Forms.Timer(this.components);
+			this.bubbleTimer = new System.Windows.Forms.Timer(this.components);
 			this.pictureBox1 = new System.Windows.Forms.PictureBox();
+			this.bubblePanel = new System.Windows.Forms.Panel();
+			this.bubbleLabel = new System.Windows.Forms.Label();
+			this.bubblePanel.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
 			this.SuspendLayout();
 			// 
@@ -62,6 +66,40 @@
 			this.pictureBox1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.PictureBox1_MouseDown);
 			this.pictureBox1.MouseUp += new System.Windows.Forms.MouseEventHandler(this.PictureBox1_MouseUp);
 			// 
+			// bubblePanel
+			// 
+			this.bubblePanel.AutoSize = true;
+			this.bubblePanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+			this.bubblePanel.BackColor = System.Drawing.Color.White;
+			this.bubblePanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.bubblePanel.Controls.Add(this.bubbleLabel);
+			this.bubblePanel.Location = new System.Drawing.Point(0, 0);
+			this.bubblePanel.MaximumSize = new System.Drawing.Size(250, 200);
+			this.bubblePanel.MinimumSize = new System.Drawing.Size(30, 20);
+			this.bubblePanel.Name = "bubblePanel";
+			this.bubblePanel.Padding = new System.Windows.Forms.Padding(6);
+			this.bubblePanel.Size = new System.Drawing.Size(42, 32);
+			this.bubblePanel.TabIndex = 4;
+			this.bubblePanel.Visible = false;
+			// 
+			// bubbleLabel
+			// 
+			this.bubbleLabel.AutoSize = true;
+			this.bubbleLabel.BackColor = System.Drawing.Color.White;
+			this.bubbleLabel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+			this.bubbleLabel.ForeColor = System.Drawing.Color.Black;
+			this.bubbleLabel.Location = new System.Drawing.Point(6, 6);
+			this.bubbleLabel.MaximumSize = new System.Drawing.Size(230, 180);
+			this.bubbleLabel.Name = "bubbleLabel";
+			this.bubbleLabel.Size = new System.Drawing.Size(10, 15);
+			this.bubbleLabel.TabIndex = 0;
+			this.bubbleLabel.Text = "";
+			// 
+			// bubbleTimer
+			// 
+			this.bubbleTimer.Interval = 8000;
+			this.bubbleTimer.Tick += new System.EventHandler(this.BubbleTimer_Tick);
+			// 
 			// FormPet
 			// 
 			this.AllowDrop = true;
@@ -70,6 +108,7 @@
 			this.BackColor = System.Drawing.Color.Magenta;
 			this.ClientSize = new System.Drawing.Size(40, 40);
 			this.ControlBox = false;
+			this.Controls.Add(this.bubblePanel);
 			this.Controls.Add(this.pictureBox1);
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -85,6 +124,8 @@
 			this.DragDrop += new System.Windows.Forms.DragEventHandler(this.Form2_DragDrop);
 			this.DragEnter += new System.Windows.Forms.DragEventHandler(this.Form2_DragEnter);
 			((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+			this.bubblePanel.ResumeLayout(false);
+			this.bubblePanel.PerformLayout();
 			this.ResumeLayout(false);
 
         }
@@ -93,6 +134,9 @@
 
         private System.Windows.Forms.ImageList imageList1;
         private System.Windows.Forms.Timer timer1;
+        private System.Windows.Forms.Timer bubbleTimer;
+        private System.Windows.Forms.Panel bubblePanel;
+        private System.Windows.Forms.Label bubbleLabel;
         private System.Windows.Forms.PictureBox pictureBox1;
     }
 }

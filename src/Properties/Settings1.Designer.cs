@@ -130,5 +130,54 @@ namespace DesktopPet.Properties {
                 this["Scale"] = value;
             }
         }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://localhost:11434")]
+        public string OllamaEndpoint {
+            get {
+                return ((string)(this["OllamaEndpoint"]));
+            }
+            set {
+                this["OllamaEndpoint"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("llama3.2:1b")]
+        public string OllamaModel {
+            get {
+                return ((string)(this["OllamaModel"]));
+            }
+            set {
+                this["OllamaModel"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Eres una mascota virtual adorable y graciosa. Tus respuestas deben ser muy cortas" +
+            ", maximo 2 oraciones. Respondes en espanol.")]
+        public string OllamaSystemPrompt {
+            get {
+                return ((string)(this["OllamaSystemPrompt"]));
+            }
+            set {
+                this["OllamaSystemPrompt"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool OllamaEnabled {
+            get {
+                return ((bool)(this["OllamaEnabled"]));
+            }
+            set {
+                this["OllamaEnabled"] = value;
+            }
+        }
     }
 }

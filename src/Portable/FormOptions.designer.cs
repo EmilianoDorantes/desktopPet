@@ -67,6 +67,13 @@ namespace DesktopPet
             ((System.ComponentModel.ISupportInitialize)(this.trackBar3)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar2)).BeginInit();
             this.flowLayoutPanel2.SuspendLayout();
+            // 
+            // tabPageAI
+            // 
+            this.tabPageAI = new System.Windows.Forms.TabPage();
+            this.tableLayoutAI = new System.Windows.Forms.TableLayoutPanel();
+            this.tabPageAI.SuspendLayout();
+            this.tableLayoutAI.SuspendLayout();
             this.SuspendLayout();
             // 
             // button1
@@ -82,12 +89,147 @@ namespace DesktopPet
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
+            // tabPageAI
+            // 
+            this.chkOllamaEnabled = new System.Windows.Forms.CheckBox();
+            this.lblModelStatus = new System.Windows.Forms.Label();
+            this.lblOllamaPrompt = new System.Windows.Forms.Label();
+            this.txtOllamaPrompt = new System.Windows.Forms.TextBox();
+            this.btnTestConnection = new System.Windows.Forms.Button();
+            this.btnDownloadModel = new System.Windows.Forms.Button();
+            this.lblConnectionStatus = new System.Windows.Forms.Label();
+            this.tabPageAI.Location = new System.Drawing.Point(124, 4);
+            this.tabPageAI.Name = "tabPageAI";
+            this.tabPageAI.Size = new System.Drawing.Size(357, 333);
+            this.tabPageAI.TabIndex = 4;
+            this.tabPageAI.Text = "AI Chat";
+            this.tabPageAI.UseVisualStyleBackColor = true;
+            // 
+            // tableLayoutAI
+            // 
+            this.tableLayoutAI.ColumnCount = 2;
+            this.tableLayoutAI.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 35F));
+            this.tableLayoutAI.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 65F));
+            this.tableLayoutAI.Controls.Add(this.chkOllamaEnabled, 0, 0);
+            this.tableLayoutAI.Controls.Add(this.lblModelStatus, 1, 1);
+            this.tableLayoutAI.Controls.Add(this.btnDownloadModel, 0, 2);
+            this.tableLayoutAI.Controls.Add(this.lblOllamaPrompt, 0, 3);
+            this.tableLayoutAI.Controls.Add(this.txtOllamaPrompt, 1, 3);
+            this.tableLayoutAI.Controls.Add(this.btnTestConnection, 0, 8);
+            this.tableLayoutAI.Controls.Add(this.lblConnectionStatus, 1, 8);
+            this.tableLayoutAI.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutAI.Location = new System.Drawing.Point(0, 0);
+            this.tableLayoutAI.Name = "tableLayoutAI";
+            this.tableLayoutAI.RowCount = 10;
+            this.tableLayoutAI.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
+            this.tableLayoutAI.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
+            this.tableLayoutAI.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
+            this.tableLayoutAI.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
+            this.tableLayoutAI.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
+            this.tableLayoutAI.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutAI.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
+            this.tableLayoutAI.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
+            this.tableLayoutAI.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
+            this.tableLayoutAI.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
+            this.tableLayoutAI.Size = new System.Drawing.Size(357, 333);
+            this.tableLayoutAI.TabIndex = 0;
+            this.tabPageAI.Controls.Add(this.tableLayoutAI);
+            // 
+            // lblModelStatus
+            // 
+            this.lblModelStatus.AutoSize = true;
+            this.lblModelStatus.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lblModelStatus.Location = new System.Drawing.Point(127, 30);
+            this.lblModelStatus.Name = "lblModelStatus";
+            this.lblModelStatus.Size = new System.Drawing.Size(227, 30);
+            this.lblModelStatus.TabIndex = 2;
+            this.lblModelStatus.Text = "Checking model...";
+            this.lblModelStatus.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // btnDownloadModel
+            // 
+            this.btnDownloadModel.Location = new System.Drawing.Point(3, 63);
+            this.btnDownloadModel.Name = "btnDownloadModel";
+            this.btnDownloadModel.Size = new System.Drawing.Size(118, 23);
+            this.btnDownloadModel.TabIndex = 3;
+            this.btnDownloadModel.Text = "Download Model";
+            this.btnDownloadModel.UseVisualStyleBackColor = true;
+            this.btnDownloadModel.Click += new System.EventHandler(this.BtnDownloadModel_Click);
+            // 
+            // btnTestConnection
+            // 
+            this.btnTestConnection.Location = new System.Drawing.Point(3, 243);
+            this.btnTestConnection.Name = "btnTestConnection";
+            this.btnTestConnection.Size = new System.Drawing.Size(100, 23);
+            this.btnTestConnection.TabIndex = 7;
+            this.btnTestConnection.Text = "Test Connection";
+            this.btnTestConnection.UseVisualStyleBackColor = true;
+            this.btnTestConnection.Click += new System.EventHandler(this.BtnTestConnection_Click);
+            // 
+            // lblConnectionStatus
+            // 
+            this.lblConnectionStatus.AutoSize = true;
+            this.lblConnectionStatus.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lblConnectionStatus.Location = new System.Drawing.Point(127, 243);
+            this.lblConnectionStatus.Name = "lblConnectionStatus";
+            this.lblConnectionStatus.Size = new System.Drawing.Size(227, 30);
+            this.lblConnectionStatus.TabIndex = 8;
+            this.lblConnectionStatus.Text = "";
+            this.lblConnectionStatus.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // chkOllamaEnabled
+            // 
+            this.chkOllamaEnabled.AutoSize = true;
+            this.chkOllamaEnabled.Location = new System.Drawing.Point(3, 3);
+            this.chkOllamaEnabled.Name = "chkOllamaEnabled";
+            this.chkOllamaEnabled.Size = new System.Drawing.Size(100, 24);
+            this.chkOllamaEnabled.TabIndex = 0;
+            this.chkOllamaEnabled.Text = "Enabled AI";
+            this.chkOllamaEnabled.UseVisualStyleBackColor = true;
+            this.chkOllamaEnabled.CheckedChanged += new System.EventHandler(this.ChkOllamaEnabled_CheckedChanged);
+            // 
+            // lblOllamaPrompt
+            // 
+            this.lblOllamaPrompt.AutoSize = true;
+            this.lblOllamaPrompt.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lblOllamaPrompt.Location = new System.Drawing.Point(3, 90);
+            this.lblOllamaPrompt.Name = "lblOllamaPrompt";
+            this.lblOllamaPrompt.Size = new System.Drawing.Size(118, 30);
+            this.lblOllamaPrompt.TabIndex = 5;
+            this.lblOllamaPrompt.Text = "System Prompt";
+            this.lblOllamaPrompt.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // txtOllamaPrompt
+            // 
+            this.txtOllamaPrompt.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.txtOllamaPrompt.Location = new System.Drawing.Point(127, 93);
+            this.txtOllamaPrompt.Multiline = true;
+            this.txtOllamaPrompt.Name = "txtOllamaPrompt";
+            this.tableLayoutAI.SetRowSpan(this.txtOllamaPrompt, 4);
+            this.txtOllamaPrompt.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.txtOllamaPrompt.Size = new System.Drawing.Size(227, 192);
+            this.txtOllamaPrompt.TabIndex = 6;
+            // txtOllamaPrompt changes are saved via btnSavePrompt
+            // 
+            // btnSavePrompt
+            // 
+            this.btnSavePrompt = new System.Windows.Forms.Button();
+            this.btnSavePrompt.Location = new System.Drawing.Point(127, 213);
+            this.btnSavePrompt.Name = "btnSavePrompt";
+            this.btnSavePrompt.Size = new System.Drawing.Size(100, 23);
+            this.btnSavePrompt.TabIndex = 10;
+            this.btnSavePrompt.Text = "Save Prompt";
+            this.btnSavePrompt.UseVisualStyleBackColor = true;
+            this.btnSavePrompt.Click += new System.EventHandler(this.BtnSavePrompt_Click);
+            this.tableLayoutAI.Controls.Add(this.btnSavePrompt, 1, 7);
+            // 
             // tabControl1
             // 
             this.tabControl1.Alignment = System.Windows.Forms.TabAlignment.Left;
             this.tabControl1.Controls.Add(this.tabPage1);
             this.tabControl1.Controls.Add(this.tabPage2);
             this.tabControl1.Controls.Add(this.tabPage4);
+            this.tabControl1.Controls.Add(this.tabPageAI);
             this.tabControl1.DrawMode = System.Windows.Forms.TabDrawMode.OwnerDrawFixed;
             this.tabControl1.ItemSize = new System.Drawing.Size(40, 120);
             this.tabControl1.Location = new System.Drawing.Point(0, 1);
@@ -456,6 +598,9 @@ namespace DesktopPet
             ((System.ComponentModel.ISupportInitialize)(this.trackBar3)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar2)).EndInit();
             this.flowLayoutPanel2.ResumeLayout(false);
+            this.tableLayoutAI.ResumeLayout(false);
+            this.tableLayoutAI.PerformLayout();
+            this.tabPageAI.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -488,5 +633,15 @@ namespace DesktopPet
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel2;
         private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.TabPage tabPageAI;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutAI;
+        private System.Windows.Forms.CheckBox chkOllamaEnabled;
+        private System.Windows.Forms.Label lblModelStatus;
+        private System.Windows.Forms.Button btnDownloadModel;
+        private System.Windows.Forms.Label lblOllamaPrompt;
+        private System.Windows.Forms.TextBox txtOllamaPrompt;
+        private System.Windows.Forms.Button btnTestConnection;
+        private System.Windows.Forms.Label lblConnectionStatus;
+        private System.Windows.Forms.Button btnSavePrompt;
     }
 }

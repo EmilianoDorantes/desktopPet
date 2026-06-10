@@ -2,7 +2,9 @@
 using System.Drawing;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Collections.Generic;
 using static DesktopPet.StartUp;
 
 #if !PORTABLE
@@ -21,6 +23,9 @@ namespace DesktopPet
         /// Maximal sheeps (too much sheeps will cover too much the screen and would not be nice to see).
         /// </summary>
         public const int MAX_SHEEPS = 16;
+        private static readonly Random chatRand = new Random();
+
+        public static StartUp Instance { get; private set; }
 
         /// <summary>
         /// DEBUG TYPE. If you press "SHIFT" by starting the application, a debug Window will appear.
@@ -50,6 +55,10 @@ namespace DesktopPet
         /// Each sheep is in a different form.
         /// </summary>
         readonly FormPet[] sheeps = new FormPet[MAX_SHEEPS];
+        private TriggerEngine triggerEngine;
+        private PerformanceHelper perfHelper;
+        private OllamaService ollamaSvc;
+        internal LocalModelManager ModelManager;
 
         /// <summary>
         /// Debug window, used only if SHIFT was pressed by starting the application.
@@ -100,6 +109,7 @@ namespace DesktopPet
         /// <param name="processIcon">ProcessIcon class, to change icon when a new pet is selected.</param>
         public StartUp(ProcessIcon processIcon)
         {
+            Instance = this;
             pi = processIcon;
                         
                 // Init XML class
@@ -140,6 +150,53 @@ namespace DesktopPet
 
             Program.MyData.ListenOnXMLChanged(XmlFileChanged);
             Program.MyData.ListenOnOptionsChanged(OptionFileChanged);
+
+            perfHelper = new PerformanceHelper();
+            ollamaSvc = new OllamaService();
+            InitializeTriggerEngine();
+
+            ModelManager = new LocalModelManager();
+            ModelManager.StatusChanged += () =>
+            {
+                StartUp.AddDebugInfo(DEBUG_TYPE.info, "Model: " + ModelManager.Status);
+                if (ModelManager.IsReady)
+                {
+                    ConfigureOllama();
+                    if (triggerEngine != null && Program.MyData.GetOllamaEnabled())
+                        RestartTriggerEngine();
+                }
+            };
+            _ = InitModelAsync();
+        }
+
+        private async Task InitModelAsync()
+        {
+            await ModelManager.EnsureModelReadyAsync();
+            AddDebugInfo(DEBUG_TYPE.info, "Local model: " + ModelManager.Status);
+        }
+
+        private void InitializeTriggerEngine()
+        {
+            if (ollamaSvc != null) ollamaSvc.SyncFromConfig();
+            if (perfHelper == null) perfHelper = new PerformanceHelper();
+
+            triggerEngine = new TriggerEngine(ollamaSvc, perfHelper);
+            triggerEngine.OnMessageGenerated += (msg) =>
+            {
+                if (iSheeps == 0) return;
+                var pet = sheeps[chatRand.Next(iSheeps)];
+                if (pet != null && !pet.IsDisposed)
+                {
+                    pet.ShowBubble(msg);
+                }
+            };
+            triggerEngine.Start();
+        }
+
+        public void RestartTriggerEngine()
+        {
+            triggerEngine?.Stop();
+            InitializeTriggerEngine();
         }
 
 
@@ -177,6 +234,7 @@ namespace DesktopPet
             if (iSheeps < MAX_SHEEPS)
             {
                 var newSheep = new FormPet(animations, xml);
+                newSheep.PetIndex = iSheeps;
                 foreach (var sprite in xml.sprites)
                 {
                     newSheep.AddImage(sprite);
@@ -188,12 +246,74 @@ namespace DesktopPet
                 
                     // Start the animation of the pet
                 sheeps[iSheeps].Play(true);
+                ConfigureOllama();
                 iSheeps++;
             }
             else
             {
                 AddDebugInfo(DEBUG_TYPE.warning, "max PETs reached");
             }
+        }
+
+        public void ConfigureOllama()
+        {
+            var ep = Program.MyData.GetOllamaEndpoint();
+            var mod = Program.MyData.GetOllamaModel();
+            var sp = Program.MyData.GetOllamaSystemPrompt();
+            var en = Program.MyData.GetOllamaEnabled();
+            OllamaClient.Configure(ep, mod, sp, en);
+
+            if (ollamaSvc != null)
+            {
+                ollamaSvc.Endpoint = ep;
+                ollamaSvc.ModelName = mod;
+                ollamaSvc.SystemPrompt = sp;
+            }
+            if (en)
+            {
+                RestartTriggerEngine();
+            }
+            else
+            {
+                triggerEngine?.Stop();
+            }
+        }
+
+        public FormPet GetRandomPet(FormPet exclude)
+        {
+            if (iSheeps <= 1) return null;
+            var candidates = new List<FormPet>();
+            for (int i = 0; i < iSheeps; i++)
+            {
+                if (sheeps[i] != null && sheeps[i] != exclude && !sheeps[i].IsDisposed)
+                    candidates.Add(sheeps[i]);
+            }
+            if (candidates.Count == 0) return null;
+            return candidates[chatRand.Next(candidates.Count)];
+        }
+
+        public void BroadcastMessage(FormPet sender, string message)
+        {
+            if (iSheeps < 2) return;
+            var target = GetRandomPet(sender);
+            if (target == null) return;
+
+            var targetName = target.PetName;
+            var senderName = sender.PetName;
+            string prompt = $"{senderName} dijo: \"{message}\". {targetName}, responde como mascota virtual de forma corta y graciosa.";
+
+            System.Windows.Forms.Timer responseTimer = new System.Windows.Forms.Timer();
+            responseTimer.Interval = 3000 + chatRand.Next(3000);
+            responseTimer.Tick += (s, e) =>
+            {
+                responseTimer.Stop();
+                responseTimer.Dispose();
+                if (!target.IsDisposed)
+                {
+                    target.TriggerAI(prompt);
+                }
+            };
+            responseTimer.Start();
         }
 
             /// <summary>
