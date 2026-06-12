@@ -25,10 +25,10 @@ namespace DesktopPet
         public event Action StatusChanged;
 
         private const string LLAMA_SERVER_URL =
-            "https://github.com/ggml-org/llama.cpp/releases/download/b4897/llama-b4897-bin-win-msvc-x64.zip";
+            "https://github.com/ggml-org/llama.cpp/releases/download/b9601/llama-b9601-bin-win-cpu-x64.zip";
         private const string MODEL_URL =
-            "https://huggingface.co/bartowski/Phi-4-mini-instruct-GGUF/resolve/main/Phi-4-mini-instruct-Q4_K_M.gguf";
-        private const string MODEL_FILENAME = "Phi-4-mini-instruct-Q4_K_M.gguf";
+            "https://huggingface.co/bartowski/microsoft_Phi-4-mini-instruct-GGUF/resolve/main/microsoft_Phi-4-mini-instruct-Q4_K_M.gguf";
+        private const string MODEL_FILENAME = "microsoft_Phi-4-mini-instruct-Q4_K_M.gguf";
         private const string SERVER_FILENAME = "llama-server.exe";
 
         public LocalModelManager()
