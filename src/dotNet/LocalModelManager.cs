@@ -48,7 +48,12 @@ namespace DesktopPet
             {
                 _status = "Downloading llama-server...";
                 StatusChanged?.Invoke();
-                await DownloadFileAsync(LLAMA_SERVER_URL, Path.Combine(_modelsDir, "llama.zip"));
+                string zipPath = Path.Combine(_modelsDir, "llama.zip");
+                if (File.Exists(zipPath))
+                {
+                    try { File.Delete(zipPath); } catch { }
+                }
+                await DownloadFileAsync(LLAMA_SERVER_URL, zipPath);
                 try
                 {
                     ZipFile.ExtractToDirectory(Path.Combine(_modelsDir, "llama.zip"), _modelsDir);
@@ -66,11 +71,17 @@ namespace DesktopPet
 
             if (!modelExists)
             {
-                _status = "Downloading Phi-4-mini model (~2.5 GB)...";
+                _status = "Downloading Gemma 3 model (~806 MB)...";
                 StatusChanged?.Invoke();
-                await DownloadFileAsync(MODEL_URL, _modelPath + ".tmp");
-                if (File.Exists(_modelPath + ".tmp"))
-                    File.Move(_modelPath + ".tmp", _modelPath);
+                string tmpPath = _modelPath + ".tmp";
+                // Clean up any leftover .tmp from a previous failed download
+                if (File.Exists(tmpPath))
+                {
+                    try { File.Delete(tmpPath); } catch { }
+                }
+                await DownloadFileAsync(MODEL_URL, tmpPath);
+                if (File.Exists(tmpPath))
+                    File.Move(tmpPath, _modelPath);
                 modelExists = File.Exists(_modelPath);
             }
 
